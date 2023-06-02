@@ -1,64 +1,30 @@
-function getDaysInMonth($month, $year) {
-
-  // Check for leap years
-  if (is_leap_year($year)) {
-    if ($month == 2) {
-      $days = 29;
+  // Check if the month is February
+  if ($month == 2) {
+    // Check if the year is a leap year
+    if ($year % 4 == 0) {
+      // February has 29 days in a leap year
+      return 29;
     } else {
-      $days = 31;
+      // February has 28 days in a non-leap year
+      return 28;
     }
+  } else if ($month == 1 || $month == 3 || $month == 5 || $month == 7 || $month == 8 || $month == 10 || $month == 12) {
+    // These months have 31 days
+    return 31;
   } else {
-    switch ($month) {
-      case 1:
-      case 3:
-      case 5:
-      case 7:
-      case 8:
-      case 10:
-      case 12:
-        $days = 31;
-        break;
-      case 2:
-        $days = 28;
-        break;
-      default:
-        $days = 30;
-        break;
-    }
+    // These months have 30 days
+    return 30;
   }
-
-  return $days;
-
 }
 
-// Check if the year is a leap year
-function is_leap_year($year) {
+// Get the current year
+$year = date('Y');
 
-  // Check if the year is divisible by 4
-  if ($year % 4 == 0) {
-    // Check if the year is divisible by 100
-    if ($year % 100 == 0) {
-      // Check if the year is divisible by 400
-      if ($year % 400 == 0) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return true;
-    }
-  } else {
-    return false;
-  }
+// Loop through the months
+for ($i = 1; $i <= 12; $i++) {
+  // Get the number of days in the month
+  $days = get_days_in_month($i, $year);
 
+  // Print the month and the number of days
+  echo "$i has $days days\n";
 }
-
-// Get the current month and year
-$month = date("m");
-$year = date("Y");
-
-// Get the number of days in the current month
-$daysInMonth = getDaysInMonth($month, $year);
-
-// Print the number of days in the current month
-echo "There are " . $daysInMonth . " days in this month.";
