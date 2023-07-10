@@ -1,113 +1,15 @@
-Sure! Here's an example of PHP Laravel code that fetches data from a database based on the date and displays it in a graph using the y-axis as months and the x-axis as the number of IDs:
-
-First, you need to set up a database table with the necessary columns, including a `date` column and an `id` column. Let's assume the table is named `data`.
-
-Next, create a new Laravel controller using the following command in your terminal:
-```
-php artisan make:controller GraphController
-```
-
-Open the newly created `GraphController.php` file and add the following code:
-
-```php
-<?php
-
-namespace App\Http\Controllers;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-
-class GraphController extends Controller
-{
-    public function showGraph()
-    {
-        // Fetch data from the database
-        $data = DB::table('data')->get();
-
-        // Initialize arrays for storing values
-        $months = [];
-        $ids = [];
-
-        // Extract month and count ID for each record
-        foreach ($data as $record) {
-            $month = date('F', strtotime($record->date)); // Format month as full name (e.g., January)
-            $id = $record->id;
-            
-            // Increment count for the corresponding month
-            if (isset($months[$month])) {
-                $months[$month]++;
-            } else {
-                $months[$month] = 1;
-            }
-
-            // Store the corresponding ID
-            $ids[$month][] = $id;
-        }
-
-        // Prepare data for the graph
-        $graphData = [
-            'months' => array_keys($months),
-            'counts' => array_values($months),
-            'ids' => $ids,
-        ];
-
-        return view('graph', compact('graphData'));
-    }
-}
-```
-
-Next, create a new Laravel Blade view file named `graph.blade.php` in the `resources/views` directory and add the following code:
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Graph</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div style="width: 800px; height: 400px;">
-        <canvas id="graph"></canvas>
-    </div>
-
-    <script>
-        var graphData = @json($graphData);
-
-        var ctx = document.getElementById('graph').getContext('2d');
-        var graph = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: graphData.months,
-                datasets: [{
-                    label: 'Count',
-                    data: graphData.counts,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        stepSize: 1
-                    }
-                }
-            }
-        });
-    </script>
-</body>
-</html>
-```
-
-Finally, add a route to the `routes/web.php` file to map the `showGraph()` method in the `GraphController` to a URL. Open `routes/web.php` and add the following code:
-
-```php
-use App\Http\Controllers\GraphController;
-
-Route::get('/graph', [GraphController::class, 'showGraph']);
-```
-
-Now, when you navigate to the `/graph` URL in your browser, the graph will be displayed with the months on the y-axis and the count of IDs on the x-axis.
-
-Please note that you need to have the Chart.js library included in your HTML file for the graph to display properly. In the provided code, it is included from a CDN (Content Delivery Network).
+public function userChart(){
+Susers = User: :selectRaw(*MONTH (created at) as month, COUNT (*) as count)
+-›whereYear (' created_ at', date('Y'))
+-›gtoupBy (* month*)
+-›orderBy ('month*)
+- ›get ();
+Slabels
+0];
+$data = (];
+Scolors
+'#FF6384', '#36A2EB', '#FFCE56', '#88C34A', '#FF5722', '#009688', '#795548'
+for ($i-1; $1 < 12; $1++)
+$month = date ('F', mktime(0,0,0,$i,1));
+Scount
+0;
