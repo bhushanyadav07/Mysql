@@ -1,27 +1,28 @@
-public function userChart(){
-Susers = User: :selectRaw(*MONTH (created at) as month, COUNT (*) as count)
--›whereYear (' created_ at', date('Y'))
--›gtoupBy (* month*)
--›orderBy ('month*)
-- ›get ();
-Slabels
-0];
-$data = (];
-Scolors
-'#FF6384', '#36A2EB', '#FFCE56', '#88C34A', '#FF5722', '#009688', '#795548'*#9C2780', '#2196F3', '#FF9800* *#CODC39°,#607088
-for ($i-1; $1 < 12; $1++)
-$month = date ('F', mktime(0,0,0,$i,1));
-Scount
-0;
+<?php
 
+// Define an array of month names.
+$month_names = array(
+  1 => "January",
+  2 => "February",
+  3 => "March",
+  4 => "April",
+  5 => "May",
+  6 => "June",
+  7 => "July",
+  8 => "August",
+  9 => "September",
+  10 => "October",
+  11 => "November",
+  12 => "December",
+);
 
-‹canvas id-"chart"›</canvas>
-‹script>
-var ctx • document. getElementById(*chart*).getContext(*2d*);
-var userChart
-new Chart (ctx, {
-type: 'bar',
-data:{
-labels: (!! json_encode($labels) !!,
-datasets: (!! json_encode($datasets) !!}
-</script>
+// Get the month number from the user.
+$month_number = 7;
+
+// Get the month name from the array.
+$month_name = $month_names[$month_number];
+
+// Print the month name.
+echo $month_name;
+
+?>
