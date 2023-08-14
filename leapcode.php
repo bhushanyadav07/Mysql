@@ -28,3 +28,25 @@ for ($i = 1; $i <= 12; $i++) {
   // Print the month and the number of days
   echo "$i has $days days\n";
 }
+
+*******************************************
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use App\Models\Article;
+
+class ArticleController extends Controller
+{
+    public function index()
+    {
+        // Try to get articles from cache
+        $articles = Cache::remember('articles', 60, function () {
+            // Cache miss: Fetch articles from the database
+            return Article::orderBy('created_at', 'desc')->get();
+        });
+
+        return view('articles.index', compact('articles'));
+    }
+}
