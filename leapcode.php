@@ -46,4 +46,13 @@ REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
+  INSERT INTO articles (title, content, created_at, updated_at)
+VALUES
+    ('Article 1 Title', 'This is the content of article 1.', NOW(), NOW()),
+    ('Article 2 Title', 'This is the content of article 2.', NOW(), NOW()),
+    ('Article 3 Title', 'This is the content of article 3.', NOW(), NOW()),
+    ('Article 4 Title', 'This is the content of article 4.', NOW(), NOW()),
+    ('Article 5 Title', 'This is the content of article 5.', NOW(), NOW());
+
+
 
