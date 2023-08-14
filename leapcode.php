@@ -31,19 +31,11 @@ for ($i = 1; $i <= 12; $i++) {
 
 *******************************************
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Article extends Model
-{
-    // The table associated with the model
-    protected $table = 'articles';
-
-    // The attributes that are mass assignable
-    protected $fillable = ['title', 'content'];
-
-    // Other model methods, relationships, etc.
-}
-
+CREATE TABLE articles (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
