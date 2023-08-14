@@ -31,14 +31,19 @@ for ($i = 1; $i <= 12; $i++) {
 
 *******************************************
 
-@extends('layouts.app')
+namespace App\Models;
 
-@section('content')
-    <h1>Articles</h1>
-    <ul>
-        @foreach ($articles as $article)
-            <li>{{ $article->title }}</li>
-        @endforeach
-    </ul>
-@endsection
+use Illuminate\Database\Eloquent\Model;
+
+class Article extends Model
+{
+    // The table associated with the model
+    protected $table = 'articles';
+
+    // The attributes that are mass assignable
+    protected $fillable = ['title', 'content'];
+
+    // Other model methods, relationships, etc.
+}
+
 
