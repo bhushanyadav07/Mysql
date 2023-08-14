@@ -31,22 +31,14 @@ for ($i = 1; $i <= 12; $i++) {
 
 *******************************************
 
-namespace App\Http\Controllers;
+@extends('layouts.app')
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use App\Models\Article;
+@section('content')
+    <h1>Articles</h1>
+    <ul>
+        @foreach ($articles as $article)
+            <li>{{ $article->title }}</li>
+        @endforeach
+    </ul>
+@endsection
 
-class ArticleController extends Controller
-{
-    public function index()
-    {
-        // Try to get articles from cache
-        $articles = Cache::remember('articles', 60, function () {
-            // Cache miss: Fetch articles from the database
-            return Article::orderBy('created_at', 'desc')->get();
-        });
-
-        return view('articles.index', compact('articles'));
-    }
-}
