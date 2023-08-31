@@ -26,3 +26,40 @@ $month_name = $month_names[$month_number];
 echo $month_name;
 
 ?>
+
+
+
+<?php
+
+use Illuminate\Support\Facades\Storage;
+
+$data = [
+    "projectName" => ["hello project"],
+    "Employee Names" => ["a", "b", "c", "d"],
+    "Month" => ["Aug"]
+];
+
+$csvFileName = 'new_project_data.csv';
+$csvFilePath = storage_path('app/' . $csvFileName);
+$csvFile = fopen($csvFilePath, 'w');
+
+$columnNames = array_keys($data);
+fputcsv($csvFile, $columnNames);
+
+$maxRowCount = max(array_map('count', $data));
+
+for ($i = 0; $i < $maxRowCount; $i++) {
+    $rowData = [];
+    foreach ($columnNames as $columnName) {
+        $rowData[] = $data[$columnName][$i] ?? '';
+    }
+    fputcsv($csvFile, $rowData);
+}
+
+fclose($csvFile);
+
+Storage::disk('local')->put($csvFileName, file_get_contents($csvFilePath));
+
+echo "CSV file created and stored successfully as $csvFileName";
+
+?>
