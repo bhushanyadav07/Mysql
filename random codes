@@ -63,3 +63,66 @@ Storage::disk('local')->put($csvFileName, file_get_contents($csvFilePath));
 echo "CSV file created and stored successfully as $csvFileName";
 
 ?>
+
+///////////////
+<?php
+
+$jsonData = '{
+  "month": [
+    {
+      "day": "1",
+      "leavetype": "HH"
+    },
+    {
+      "day": "2",
+      "leavetype": "HH"
+    },
+    {
+      "day": "3",
+      "leavetype": "HH"
+    },
+    {
+      "day": "4",
+      "leavetype": "HH"
+    },
+    {
+      "day": "5",
+      "leavetype": "HH"
+    }
+  ]
+}';
+
+$data = json_decode($jsonData, true);
+
+// Initialize an array to store the leave types for each day
+$leaveTypes = array();
+
+// Process the data and populate the $leaveTypes array
+foreach ($data['month'] as $entry) {
+    $day = $entry['day'];
+    $leaveType = $entry['leavetype'];
+    $leaveTypes[$day] = $leaveType;
+}
+
+// Generate the table in transposed format
+echo '<table border="1">';
+echo '<tr><th>Leave Type</th>';
+
+// Create the header row with day numbers
+for ($day = 1; $day <= 31; $day++) {
+    echo '<th>' . $day . '</th>';
+}
+echo '</tr>';
+
+// Create the row with leave types
+echo '<tr><td>Leave Type</td>';
+for ($day = 1; $day <= 31; $day++) {
+    $leaveType = isset($leaveTypes[$day]) ? $leaveTypes[$day] : '';
+    echo '<td>' . $leaveType . '</td>';
+}
+echo '</tr>';
+
+echo '</table>';
+
+?>
+
