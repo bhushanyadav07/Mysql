@@ -126,3 +126,96 @@ echo '</table>';
 
 ?>
 
+***************************************datetime******************************
+<?php
+
+// Get the start and end dates
+$start_date = $_POST["start_date"];
+$end_date = $_POST["end_date"];
+
+// Get the start date month
+$start_month = date("m", strtotime($start_date));
+
+// Get the end date month
+$end_month = date("m", strtotime($end_date));
+
+// Create an array to store the numbers
+$numbers = [];
+
+// Iterate through the dates from the start date to the end date
+for ($i = strtotime($start_date); $i <= strtotime($end_date); $i += 86400) {
+  // Get the current date
+  $date = date("d", $i);
+
+  // Add the current date to the numbers array
+  $numbers[] = $date;
+}
+
+// Reverse the numbers array so that the output is in columns
+$numbers = array_reverse($numbers);
+
+// Calculate the number of days in each month
+$days_in_month = [
+  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+];
+
+// Initialize the column counter
+$column_counter = 0;
+
+// Iterate through the numbers array
+foreach ($numbers as $number) {
+  // Get the current month
+  $current_month = date("m", $i);
+
+  // If the current month is different from the previous month,
+  // add a new column
+  if ($current_month != $start_month) {
+    $column_counter++;
+    $start_month = $current_month;
+  }
+
+  // Add the number to the current column
+  $numbers[$column_counter * 15] = $number;
+}
+
+// Calculate the number of days between the start and end dates
+$days_between_dates = abs(strtotime($end_date) - strtotime($start_date)) / 86400;
+
+// Iterate through the numbers array and add the inbetween days
+for ($i = 1; $i < $days_between_dates; $i++) {
+  $numbers[($column_counter + 1) * 15] = $i;
+}
+
+// Add the inbetween days for each month
+for ($i = 0; $i < count($numbers); $i++) {
+  $current_month = date("m", $i * 15);
+  $number_of_days_in_month = $days_in_month[$current_month - 1];
+
+  // If the current month is different from the previous month,
+  // add the number of days in the previous month to the last column
+  if ($current_month != $start_month) {
+    $numbers[$i - 1] += $number_of_days_in_month;
+  }
+
+  // Calculate the number of columns needed
+  $number_of_columns = ceil($numbers[$i] / 15);
+
+  // Add empty columns at the end
+  for ($j = $number_of_columns; $j < 15; $j++) {
+    $numbers[$i * 15 + $j] = "";
+  }
+}
+
+// Print the numbers array in columns
+echo "<table>";
+for ($i = 0; $i < count($numbers); $i += 15) {
+  echo "<tr>";
+  for ($j = i; $j < i + 15; $j++) {
+    echo "<td>{$numbers[$j]}</td>";
+  }
+  echo "</tr>";
+}
+echo "</table>";
+
+?>
+
