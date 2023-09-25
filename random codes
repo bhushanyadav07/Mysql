@@ -31,3 +31,21 @@ if (!empty($start_date) && !empty($end_date)) {
     echo "Please provide both start and end dates.";
 }
 ?>
+
+
+//core PHP
+function calculateDaysBetween($start_date, $end_date) {
+    $start_timestamp = strtotime($start_date);
+    $end_timestamp = strtotime($end_date);
+
+    $result = [];
+    
+    if ($start_timestamp !== false && $end_timestamp !== false) {
+        for ($current_timestamp = $start_timestamp; $current_timestamp <= $end_timestamp; $current_timestamp += 86400) {
+            $current_date = date('Y-m-d', $current_timestamp);
+            $result[$current_date] = 0;
+        }
+    }
+
+    return $result;
+}
