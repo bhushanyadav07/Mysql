@@ -49,3 +49,32 @@ function calculateDaysBetween($start_date, $end_date) {
 
     return $result;
 }
+
+
+<?php
+// Define the file name
+$a = 'file.csv';
+
+// Specify the storage directory (you should change this to your desired directory)
+$storageDirectory = 'path/to/storage/directory/';
+
+// Create the full path to the file
+$filePath = $storageDirectory . $a;
+
+// Simulate storing the file in the local disk
+if (file_put_contents($filePath, 'Your file content here') !== false) {
+    // Construct the URL to access the file
+    $baseUrl = 'http://example.com'; // Replace with your base URL
+    $fileUrl = $baseUrl . '/storage/' . $a;
+
+    // Prepare the response array
+    $response = [
+        'file' => $fileUrl,
+    ];
+
+    // Return the response
+    echo json_encode($response); // In practice, you might want to use proper JSON encoding
+} else {
+    echo 'Unable to store the file.';
+}
+?>
