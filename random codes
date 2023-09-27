@@ -78,3 +78,28 @@ if (file_put_contents($filePath, 'Your file content here') !== false) {
     echo 'Unable to store the file.';
 }
 ?>
+
+
+//data put
+<?php
+// Define the file name and path
+$csvFileName = 'hello_world.csv'; // Change this to your desired file name
+$csvFilePath = '/path/to/your/directory/' . $csvFileName; // Change this to your desired directory path
+
+// Open the CSV file for writing (create it if it doesn't exist)
+$fileHandle = fopen($csvFilePath, 'w');
+
+if ($fileHandle === false) {
+    echo 'Unable to open or create the CSV file.';
+} else {
+    // Write "Hello, World!" to the CSV file
+    $data = ["Hello, World!"]; // Create an array with the data you want to write
+    fputcsv($fileHandle, $data);
+
+    // Close the CSV file
+    fclose($fileHandle);
+
+    echo 'Data has been written to ' . $csvFilePath;
+}
+?>
+
