@@ -134,3 +134,42 @@ JOIN V_EMPLOYEE_SUPERVISOR_VIEW m ON s.supervisor_id = m.employee_number
 ORDER BY s.LEVEL;';
 
 
+/////
+WITH RECURSIVE subordinate AS (
+  SELECT employee_number,
+         employee_name,
+         supervisor_id,
+         0 AS LEVEL,
+         project_codification_key,
+         project_name,
+         customer_code,
+         customer_name
+  FROM V_EMPLOYEE_SUPERVISOR_VIEW
+  WHERE employee_number = $employee_id
+  UNION ALL
+  SELECT e.employee_number,
+         e.employee_name,
+         e.supervisor_id,
+         LEVEL + 1,
+         e.project_codification_key,
+         e.project_name,
+         e.customer_code,
+         e.customer_name
+  FROM V_EMPLOYEE_SUPERVISOR_VIEW e
+  JOIN subordinate s ON e.supervisor_id = s.employee_number
+)
+SELECT
+  s.employee_number,
+  s.employee_number AS direct_superior_id,
+  e.employee_name AS direct_superior_first_name,
+  s.level,
+  s.project_codification_key,
+  s.project_name,
+  s.customer_code,
+  s.customer_name
+FROM subordinate s
+JOIN V_EMPLOYEE_SUPERVISOR_VIEW e ON s.supervisor_id = e.employee_number
+WHERE s.employee_number NOT IN (SELECT employee_number FROM subordinate)
+ORDER BY s.level;
+
+
