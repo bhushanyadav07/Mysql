@@ -1,0 +1,54 @@
+Modifying the given query to use the Nested Set Model or Closure Table Model would involve significant changes to the database schema and query structure. I'll provide an example using the Closure Table Model since it's more straightforward to understand and implement.
+
+First, you would need to create a closure table to represent the hierarchy. Here's a simplified example of a closure table:
+
+```sql
+CREATE TABLE EmployeeHierarchy (
+    ancestor_id INT,
+    descendant_id INT,
+    depth INT
+);
+
+-- Populate the closure table with initial data
+INSERT INTO EmployeeHierarchy (ancestor_id, descendant_id, depth)
+VALUES (@employee_id, @employee_id, 0);
+
+-- Add closure table entries for the hierarchy
+INSERT INTO EmployeeHierarchy (ancestor_id, descendant_id, depth)
+SELECT a.ancestor_id, d.descendant_id, (a.depth + 1)
+FROM EmployeeHierarchy AS a
+JOIN EmployeeHierarchy AS d ON a.descendant_id = d.ancestor_id
+WHERE a.depth >= 0;  -- Adjust this condition based on your data
+```
+
+In this example, the `EmployeeHierarchy` table stores the ancestor-descendant relationships between employees, along with the depth of the relationship.
+
+Now, you can query the hierarchical data using joins with the closure table, rather than using recursive queries:
+
+```php
+$localDBquery = '
+SELECT
+    s.employee_number,
+    m.employee_number AS direct_superior_id,
+    m.employee_name AS direct_superior_first_name,
+    e.depth AS level,
+    s.project_codification_key,
+    s.project_name,
+    s.customer_code,
+    s.customer_name
+FROM EmployeeHierarchy AS e
+JOIN V_EMPLOYEE_SUPERVISOR_VIEW AS s ON e.descendant_id = s.employee_number
+JOIN V_EMPLOYEE_SUPERVISOR_VIEW AS m ON e.ancestor_id = m.employee_number
+WHERE e.ancestor_id = ' . $employee_id . '
+ORDER BY e.depth;';
+```
+
+In this modified query:
+
+1. We join the `EmployeeHierarchy` table to the `V_EMPLOYEE_SUPERVISOR_VIEW` table to retrieve the hierarchical data.
+2. We use the `depth` column from the closure table to represent the level in the hierarchy.
+3. The query filters data based on the `ancestor_id` (i.e., the root employee) to get the hierarchy starting from a specific employee.
+
+Please note that implementing the Closure Table Model requires maintaining the closure table as employees are added, updated, or removed from the hierarchy. You'll need to create appropriate triggers or processes to update the closure table when changes occur.
+
+Implementing the Nested Set Model would involve a different schema design and query structure, but the principles would be similar in terms of querying without recursion. The choice between these models depends on your specific requirements and trade-offs.
