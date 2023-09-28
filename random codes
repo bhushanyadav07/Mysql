@@ -103,3 +103,34 @@ if ($fileHandle === false) {
 }
 ?>
 
+
+//imp query
+$localDBquery = 'WITH RECURSIVE subordinate AS (
+    SELECT 
+        employee_number,
+        supervisor_id,
+        0 AS LEVEL
+    FROM V_EMPLOYEE_SUPERVISOR_VIEW
+    WHERE employee_number = ' . $employee_id . '
+    UNION ALL
+    SELECT 
+        e.employee_number,
+        e.supervisor_id,
+        s.LEVEL + 1
+    FROM V_EMPLOYEE_SUPERVISOR_VIEW e
+    JOIN subordinate s ON e.supervisor_id = s.employee_number
+)
+SELECT 
+    s.employee_number,
+    m.employee_number AS direct_superior_id,
+    m.employee_name AS direct_superior_first_name,
+    s.LEVEL AS level,
+    s.project_codification_key,
+    s.project_name,
+    s.customer_code,
+    s.customer_name
+FROM subordinate s
+JOIN V_EMPLOYEE_SUPERVISOR_VIEW m ON s.supervisor_id = m.employee_number
+ORDER BY s.LEVEL;';
+
+
