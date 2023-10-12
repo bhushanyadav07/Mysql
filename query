@@ -52,3 +52,19 @@ In this modified query:
 Please note that implementing the Closure Table Model requires maintaining the closure table as employees are added, updated, or removed from the hierarchy. You'll need to create appropriate triggers or processes to update the closure table when changes occur.
 
 Implementing the Nested Set Model would involve a different schema design and query structure, but the principles would be similar in terms of querying without recursion. The choice between these models depends on your specific requirements and trade-offs.
+
+
+
+
+
+
+////
+$employees = $z_admin->table('V_EMPLOYEE_VIEW')
+    ->select('*')
+    ->whereIn('project_codification_key', [$current_project_id])
+    ->where(function ($query) use ($Semployee_id) {
+        $query->where('DCH_ID', $Semployee_id)
+            ->orWhere('VBH_ID', $Semployee_id)
+            ->orWhere('PGM_ID', $Semployee_id);
+    })
+    ->get();
