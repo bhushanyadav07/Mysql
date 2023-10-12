@@ -68,3 +68,11 @@ $employees = $z_admin->table('V_EMPLOYEE_VIEW')
             ->orWhere('PGM_ID', $Semployee_id);
     })
     ->get();
+
+
+
+$localDeQuery = DB::connection('z_admin')->table('V_EMPLOYEE_VIEW')
+    ->select('employee_number', 'employee_name', 'project_codification_key', 'project_name', 'customer_name', 'customer_code')
+    ->whereIn('supervisor_id', explode(',', $comma_seprate_sub_array))
+    ->whereIn('project_codification_key', [$current_project_id])
+    ->get();
