@@ -76,3 +76,11 @@ $localDeQuery = DB::connection('z_admin')->table('V_EMPLOYEE_VIEW')
     ->whereIn('supervisor_id', explode(',', $comma_seprate_sub_array))
     ->whereIn('project_codification_key', [$current_project_id])
     ->get();
+
+
+$localD8Query = DB::connection('z_admin')->view('V_EMPLOYEE_VIEW')
+    ->select('employee_number', 'employee_name', 'project_codification_key', 'project_name')
+    ->whereIn('employee_number', $employee_number_only)
+    ->where('project_codification_key', '=', $projectKey)
+    ->whereRaw($account_where)
+    ->get();
