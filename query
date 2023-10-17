@@ -84,3 +84,14 @@ $localD8Query = DB::connection('z_admin')->view('V_EMPLOYEE_VIEW')
     ->where('project_codification_key', '=', $projectKey)
     ->whereRaw($account_where)
     ->get();
+
+
+$query = DB::table('leaves_sa')
+    ->whereIn('user_id', [$userId])
+    ->union(DB::table('leaves_us')
+        ->whereIn('user_id', [$userId]))
+    ->union(DB::table('leaves_uk')
+        ->whereIn('user_id', [$userId]))
+    ->union(DB::table('leaves_india')
+        ->whereIn('user_id', [$userId]))
+    ->get();
