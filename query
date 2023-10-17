@@ -86,12 +86,19 @@ $localD8Query = DB::connection('z_admin')->view('V_EMPLOYEE_VIEW')
     ->get();
 
 
-$query = DB::table('leaves_sa')
-    ->whereIn('user_id', [$userId])
-    ->union(DB::table('leaves_us')
-        ->whereIn('user_id', [$userId]))
-    ->union(DB::table('leaves_uk')
-        ->whereIn('user_id', [$userId]))
-    ->union(DB::table('leaves_india')
-        ->whereIn('user_id', [$userId]))
-    ->get();
+    $query = DB::table('leaves_sa')
+        ->where('user_id', $userId)
+        ->whereBetween('start_date', [$startDate, $endDate])
+        ->union(DB::table('leaves_us')
+            ->where('user_id', $userId)
+            ->whereBetween('start_date', [$startDate, $endDate]))
+        ->union(DB::table('leaves_uk')
+            ->where('user_id', $userId)
+            ->whereBetween('start_date', [$startDate, $endDate]))
+        ->union(DB::table('leaves_india')
+            ->where('user_id', $userId)
+            ->whereBetween('start_date', [$startDate, $endDate]))
+        ->get();
+
+    // Return the results of the query.
+    return $query;
