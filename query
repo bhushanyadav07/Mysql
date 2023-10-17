@@ -174,3 +174,11 @@ foreach (['leaves_us', 'leaves_uk', 'leaves_india'] as $table) {
 }
 
 $results = $query->get();
+
+
+$results = DB::table('leaves_sa')->whereIn('user_id', $userIds)
+    ->orWhereIn('user_id', $userIds)->table('leaves_us')
+    ->orWhereIn('user_id', $userIds)->table('leaves_uk')
+    ->orWhereIn('user_id', $userIds)->table('leaves_india')
+    ->whereBetween('start_date', [$startDate, $endDate])
+    ->get();
