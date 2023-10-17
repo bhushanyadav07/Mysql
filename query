@@ -195,3 +195,14 @@ $results = DB::table('leaves_sa')->whereIn('user_id', $userIds)
     ->orWhereIn('user_id', $userIds)->table('leaves_india')
     ->whereBetween('start_date', [$startDate, $endDate])
     ->get();
+
+
+$query = DB::table('leaves_sa');
+
+$query = $query->union($query->table('leaves_us'));
+$query = $query->union($query->table('leaves_uk'));
+$query = $query->union($query->table('leaves_india'));
+
+$query = $query->whereIn('user_id', $user_ids)
+    ->whereBetween('start_date', [$start_date, $end_date])
+    ->get();
