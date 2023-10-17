@@ -1,208 +1,38 @@
-Modifying the given query to use the Nested Set Model or Closure Table Model would involve significant changes to the database schema and query structure. I'll provide an example using the Closure Table Model since it's more straightforward to understand and implement.
+use Illuminate\Support\Facades\DB;
 
-First, you would need to create a closure table to represent the hierarchy. Here's a simplified example of a closure table:
+$userIds = [1, 2, 3]; // Replace with your array of user IDs
+$startDate = '2023-01-01'; // Replace with your start date
+$endDate = '2023-12-31'; // Replace with your end date
 
-```sql
-CREATE TABLE EmployeeHierarchy (
-    ancestor_id INT,
-    descendant_id INT,
-    depth INT
+$results = DB::table('leaves_sa')
+    ->select('user_id', 'start_date', 'end_date')
+    ->whereIn('user_id', $userIds)
+    ->whereBetween('start_date', [$startDate, $endDate])
+    ->whereBetween('end_date', [$startDate, $endDate]);
+
+$results = $results->union(
+    DB::table('leaves_us')
+        ->select('user_id', 'start_date', 'end_date')
+        ->whereIn('user_id', $userIds)
+        ->whereBetween('start_date', [$startDate, $endDate])
+        ->whereBetween('end_date', [$startDate, $endDate])
 );
 
--- Populate the closure table with initial data
-INSERT INTO EmployeeHierarchy (ancestor_id, descendant_id, depth)
-VALUES (@employee_id, @employee_id, 0);
-
--- Add closure table entries for the hierarchy
-INSERT INTO EmployeeHierarchy (ancestor_id, descendant_id, depth)
-SELECT a.ancestor_id, d.descendant_id, (a.depth + 1)
-FROM EmployeeHierarchy AS a
-JOIN EmployeeHierarchy AS d ON a.descendant_id = d.ancestor_id
-WHERE a.depth >= 0;  -- Adjust this condition based on your data
-```
-
-In this example, the `EmployeeHierarchy` table stores the ancestor-descendant relationships between employees, along with the depth of the relationship.
-
-Now, you can query the hierarchical data using joins with the closure table, rather than using recursive queries:
-
-```php
-$localDBquery = '
-SELECT
-    s.employee_number,
-    m.employee_number AS direct_superior_id,
-    m.employee_name AS direct_superior_first_name,
-    e.depth AS level,
-    s.project_codification_key,
-    s.project_name,
-    s.customer_code,
-    s.customer_name
-FROM EmployeeHierarchy AS e
-JOIN V_EMPLOYEE_SUPERVISOR_VIEW AS s ON e.descendant_id = s.employee_number
-JOIN V_EMPLOYEE_SUPERVISOR_VIEW AS m ON e.ancestor_id = m.employee_number
-WHERE e.ancestor_id = ' . $employee_id . '
-ORDER BY e.depth;';
-```
-
-In this modified query:
-
-1. We join the `EmployeeHierarchy` table to the `V_EMPLOYEE_SUPERVISOR_VIEW` table to retrieve the hierarchical data.
-2. We use the `depth` column from the closure table to represent the level in the hierarchy.
-3. The query filters data based on the `ancestor_id` (i.e., the root employee) to get the hierarchy starting from a specific employee.
-
-Please note that implementing the Closure Table Model requires maintaining the closure table as employees are added, updated, or removed from the hierarchy. You'll need to create appropriate triggers or processes to update the closure table when changes occur.
-
-Implementing the Nested Set Model would involve a different schema design and query structure, but the principles would be similar in terms of querying without recursion. The choice between these models depends on your specific requirements and trade-offs.
-
-
-
-
-
-
-////
-$employees = $z_admin->table('V_EMPLOYEE_VIEW')
-    ->select('*')
-    ->whereIn('project_codification_key', [$current_project_id])
-    ->where(function ($query) use ($Semployee_id) {
-        $query->where('DCH_ID', $Semployee_id)
-            ->orWhere('VBH_ID', $Semployee_id)
-            ->orWhere('PGM_ID', $Semployee_id);
-    })
-    ->get();
-
-
-
-$localDeQuery = DB::connection('z_admin')->table('V_EMPLOYEE_VIEW')
-    ->select('employee_number', 'employee_name', 'project_codification_key', 'project_name', 'customer_name', 'customer_code')
-    ->whereIn('supervisor_id', explode(',', $comma_seprate_sub_array))
-    ->whereIn('project_codification_key', [$current_project_id])
-    ->get();
-
-
-$localD8Query = DB::connection('z_admin')->view('V_EMPLOYEE_VIEW')
-    ->select('employee_number', 'employee_name', 'project_codification_key', 'project_name')
-    ->whereIn('employee_number', $employee_number_only)
-    ->where('project_codification_key', '=', $projectKey)
-    ->whereRaw($account_where)
-    ->get();
-
-
-    $query = DB::table('leaves_sa')
-        ->where('user_id', $userId)
+$results = $results->union(
+    DB::table('leaves_uk')
+        ->select('user_id', 'start_date', 'end_date')
+        ->whereIn('user_id', $userIds)
         ->whereBetween('start_date', [$startDate, $endDate])
-        ->union(DB::table('leaves_us')
-            ->where('user_id', $userId)
-            ->whereBetween('start_date', [$startDate, $endDate]))
-        ->union(DB::table('leaves_uk')
-            ->where('user_id', $userId)
-            ->whereBetween('start_date', [$startDate, $endDate]))
-        ->union(DB::table('leaves_india')
-            ->where('user_id', $userId)
-            ->whereBetween('start_date', [$startDate, $endDate]))
-        ->get();
+        ->whereBetween('end_date', [$startDate, $endDate])
+);
 
+$results = $results->union(
+    DB::table('leaves_india')
+        ->select('user_id', 'start_date', 'end_date')
+        ->whereIn('user_id', $userIds)
+        ->whereBetween('start_date', [$startDate, $endDate])
+        ->whereBetween('end_date', [$startDate, $endDate])
+);
 
-
-$query = DB::table('leaves_sa')
-    ->whereIn('user_id', $user_ids)
-    ->whereBetween('start_date', [$startDate, $endDate])
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_us')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_uk')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_india')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-    ->get();
-
-    // Return the results of the query.
-    return $query;
-
-
-function searchLeaves($user_ids, $startDate, $endDate) {
-    $query = DB::table('leaves_sa')
-        ->whereIn('user_id', $user_ids)
-        ->whereBetween('start_date', [$startDate, $endDate]);
-
-    foreach (['leaves_us', 'leaves_uk', 'leaves_india'] as $table) {
-        $query->orWhere(function($query) use ($user_ids, $startDate, $endDate, $table) {
-            $query->table($table)
-                ->whereIn('user_id', $user_ids)
-                ->whereBetween('start_date', [$startDate, $endDate]);
-        });
-    }
-
-    return $query->get();
-}
-
-
-$query = DB::table('leaves_sa')
-    ->whereIn('user_id', $user_ids)
-    ->whereBetween('start_date', [$startDate, $endDate])
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_us')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_uk')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
-        $query->table('leaves_india')
-            ->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$startDate, $endDate]);
-    })
-
-
-
-
-$query = DB::table('leaves_sa');
-
-$query = $query->union($query->table('leaves_us'));
-$query = $query->union($query->table('leaves_uk'));
-$query = $query->union($query->table('leaves_india'));
-
-$query = $query->whereIn('user_id', $user_ids)
-    ->whereBetween('start_date', [$start_date, $end_date])
-    ->get();
-    ->get();
-
-
-$query = DB::table('leaves_sa');
-
-foreach (['leaves_us', 'leaves_uk', 'leaves_india'] as $table) {
-    $query->orWhereHas($table, function ($query) use ($user_ids, $start_date, $end_date) {
-        $query->whereIn('user_id', $user_ids)
-            ->whereBetween('start_date', [$start_date, $end_date]);
-    });
-}
-
-$results = $query->get();
-
-
-$results = DB::table('leaves_sa')->whereIn('user_id', $userIds)
-    ->orWhereIn('user_id', $userIds)->table('leaves_us')
-    ->orWhereIn('user_id', $userIds)->table('leaves_uk')
-    ->orWhereIn('user_id', $userIds)->table('leaves_india')
-    ->whereBetween('start_date', [$startDate, $endDate])
-    ->get();
-
-
-$query = DB::table('leaves_sa');
-
-$query = $query->union($query->table('leaves_us'));
-$query = $query->union($query->table('leaves_uk'));
-$query = $query->union($query->table('leaves_india'));
-
-$query = $query->whereIn('user_id', $user_ids)
-    ->whereBetween('start_date', [$start_date, $end_date])
-    ->get();
+// You can order the results as needed
+$results = $results->orderBy('user_id')->orderBy('start_date')->get();
