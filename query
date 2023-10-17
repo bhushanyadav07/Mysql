@@ -162,3 +162,15 @@ $query = DB::table('leaves_sa')
             ->whereBetween('start_date', [$startDate, $endDate]);
     })
     ->get();
+
+
+$query = DB::table('leaves_sa');
+
+foreach (['leaves_us', 'leaves_uk', 'leaves_india'] as $table) {
+    $query->orWhereHas($table, function ($query) use ($user_ids, $start_date, $end_date) {
+        $query->whereIn('user_id', $user_ids)
+            ->whereBetween('start_date', [$start_date, $end_date]);
+    });
+}
+
+$results = $query->get();
