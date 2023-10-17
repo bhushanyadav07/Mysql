@@ -124,3 +124,20 @@ $query = DB::table('leaves_sa')
 
     // Return the results of the query.
     return $query;
+
+
+function searchLeaves($user_ids, $startDate, $endDate) {
+    $query = DB::table('leaves_sa')
+        ->whereIn('user_id', $user_ids)
+        ->whereBetween('start_date', [$startDate, $endDate]);
+
+    foreach (['leaves_us', 'leaves_uk', 'leaves_india'] as $table) {
+        $query->orWhere(function($query) use ($user_ids, $startDate, $endDate, $table) {
+            $query->table($table)
+                ->whereIn('user_id', $user_ids)
+                ->whereBetween('start_date', [$startDate, $endDate]);
+        });
+    }
+
+    return $query->get();
+}
