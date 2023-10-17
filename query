@@ -100,5 +100,27 @@ $localD8Query = DB::connection('z_admin')->view('V_EMPLOYEE_VIEW')
             ->whereBetween('start_date', [$startDate, $endDate]))
         ->get();
 
+
+
+$query = DB::table('leaves_sa')
+    ->whereIn('user_id', $user_ids)
+    ->whereBetween('start_date', [$startDate, $endDate])
+    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
+        $query->table('leaves_us')
+            ->whereIn('user_id', $user_ids)
+            ->whereBetween('start_date', [$startDate, $endDate]);
+    })
+    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
+        $query->table('leaves_uk')
+            ->whereIn('user_id', $user_ids)
+            ->whereBetween('start_date', [$startDate, $endDate]);
+    })
+    ->orWhere(function($query) use ($user_ids, $startDate, $endDate) {
+        $query->table('leaves_india')
+            ->whereIn('user_id', $user_ids)
+            ->whereBetween('start_date', [$startDate, $endDate]);
+    })
+    ->get();
+
     // Return the results of the query.
     return $query;
