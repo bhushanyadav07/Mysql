@@ -1,38 +1,21 @@
-use Illuminate\Support\Facades\DB;
+Method 1: Using OpenSSL
 
-$userIds = [1, 2, 3]; // Replace with your array of user IDs
-$startDate = '2023-01-01'; // Replace with your start date
-$endDate = '2023-12-31'; // Replace with your end date
+Download and install OpenSSL on your Windows server.
+Open a command prompt window.
+Navigate to the directory where your .pem file is located.
+Run the following command:
+openssl rsa -in my_pem_file.pem -out my_key_file.key
+Replace my_pem_file.pem with the name of your .pem file and my_key_file.key with the name of the key file that you want to create.
 
-$results = DB::table('leaves_sa')
-    ->select('user_id', 'start_date', 'end_date')
-    ->whereIn('user_id', $userIds)
-    ->whereBetween('start_date', [$startDate, $endDate])
-    ->whereBetween('end_date', [$startDate, $endDate]);
+Enter a password for the key file when prompted.
+Method 2: Using PuTTYgen
 
-$results = $results->union(
-    DB::table('leaves_us')
-        ->select('user_id', 'start_date', 'end_date')
-        ->whereIn('user_id', $userIds)
-        ->whereBetween('start_date', [$startDate, $endDate])
-        ->whereBetween('end_date', [$startDate, $endDate])
-);
+Download and install PuTTYgen on your Windows server.
+Open PuTTYgen.
+Click the Load button and select your .pem file.
+Click the Save Private Key button and select the location where you want to save the key file.
+In the Key comment field, enter a comment for the key file.
+Click the Save button.
+Once you have converted the .pem file to a key file, you can use the key file to authenticate with your Windows server.
 
-$results = $results->union(
-    DB::table('leaves_uk')
-        ->select('user_id', 'start_date', 'end_date')
-        ->whereIn('user_id', $userIds)
-        ->whereBetween('start_date', [$startDate, $endDate])
-        ->whereBetween('end_date', [$startDate, $endDate])
-);
-
-$results = $results->union(
-    DB::table('leaves_india')
-        ->select('user_id', 'start_date', 'end_date')
-        ->whereIn('user_id', $userIds)
-        ->whereBetween('start_date', [$startDate, $endDate])
-        ->whereBetween('end_date', [$startDate, $endDate])
-);
-
-// You can order the results as needed
-$results = $results->orderBy('user_id')->orderBy('start_date')->get();
+Important: Be sure to store the key file in a secure location. If the key file is lost or stolen, it could allow someone else to access your Windows server.
