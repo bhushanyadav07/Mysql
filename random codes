@@ -1,179 +1,35 @@
-<?php
-function calculateDaysBetween($start_date, $end_date) {
-    $start = new DateTime($start_date);
-    $end = new DateTime($end_date);
-    $interval = new DateInterval('P1D'); // 1 day interval
+function getMonthDifference($startDate, $endDate) {
+  // Convert dates to DateTime objects for easier manipulation
+  $date1 = new DateTime($startDate);
+  $date2 = new DateTime($endDate);
 
-    $period = new DatePeriod($start, $interval, $end);
+  // Calculate the difference in years
+  $yearDiff = $date2->diff($date1)->y;
 
-    $result = [];
-    foreach ($period as $date) {
-        $result[$date->format('Y-m-d')] = 0;
+  // Calculate the difference in months within the same year
+  $monthDiff = ($date2->m - $date1->m);
+
+  // Handle cases where the end date is in an earlier month of the same year
+  if ($date2->d < $date1->d) {
+    $monthDiff--;
+  }
+
+  // Add the total months from year difference
+  $monthDiff += ($yearDiff * 12);
+
+  // Check for leap year if the difference is exactly 48 months (4 years)
+  if ($monthDiff === 48) {
+    // Check if the start date's year is a leap year
+    if (date('L', strtotime($startDate))) {
+      $monthDiff++;
     }
+  }
 
-    return $result;
+  return $monthDiff;
 }
 
-$start_date = $_POST['start_date']; // You can replace this with your input method (e.g., $_POST or $_GET)
-$end_date = $_POST['end_date']; // You can replace this with your input method (e.g., $_POST or $_GET)
+// Example usage
+$startDate = "2023-11-01";
+$endDate = "2024-03-11";
 
-if (!empty($start_date) && !empty($end_date)) {
-    $daysBetween = calculateDaysBetween($start_date, $end_date);
-
-    // Output the results
-    echo "Days between $start_date and $end_date:<br>";
-
-    foreach ($daysBetween as $date => $count) {
-        echo "$date<br>";
-    }
-    echo "Total count: " . count($daysBetween);
-} else {
-    echo "Please provide both start and end dates.";
-}
-?>
-
-
-//core PHP
-function calculateDaysBetween($start_date, $end_date) {
-    $start_timestamp = strtotime($start_date);
-    $end_timestamp = strtotime($end_date);
-
-    $result = [];
-    
-    if ($start_timestamp !== false && $end_timestamp !== false) {
-        for ($current_timestamp = $start_timestamp; $current_timestamp <= $end_timestamp; $current_timestamp += 86400) {
-            $current_date = date('Y-m-d', $current_timestamp);
-            $result[$current_date] = 0;
-        }
-    }
-
-    return $result;
-}
-
-
-<?php
-// Define the file name
-$a = 'file.csv';
-
-// Specify the storage directory (you should change this to your desired directory)
-$storageDirectory = 'path/to/storage/directory/';
-
-// Create the full path to the file
-$filePath = $storageDirectory . $a;
-
-// Simulate storing the file in the local disk
-if (file_put_contents($filePath, 'Your file content here') !== false) {
-    // Construct the URL to access the file
-    $baseUrl = 'http://example.com'; // Replace with your base URL
-    $fileUrl = $baseUrl . '/storage/' . $a;
-
-    // Prepare the response array
-    $response = [
-        'file' => $fileUrl,
-    ];
-
-    // Return the response
-    echo json_encode($response); // In practice, you might want to use proper JSON encoding
-} else {
-    echo 'Unable to store the file.';
-}
-?>
-
-
-//data put
-<?php
-// Define the file name and path
-$csvFileName = 'hello_world.csv'; // Change this to your desired file name
-$csvFilePath = '/path/to/your/directory/' . $csvFileName; // Change this to your desired directory path
-
-// Open the CSV file for writing (create it if it doesn't exist)
-$fileHandle = fopen($csvFilePath, 'w');
-
-if ($fileHandle === false) {
-    echo 'Unable to open or create the CSV file.';
-} else {
-    // Write "Hello, World!" to the CSV file
-    $data = ["Hello, World!"]; // Create an array with the data you want to write
-    fputcsv($fileHandle, $data);
-
-    // Close the CSV file
-    fclose($fileHandle);
-
-    echo 'Data has been written to ' . $csvFilePath;
-}
-?>
-
-
-//imp query
-$localDBquery = 'WITH RECURSIVE subordinate AS (
-    SELECT 
-        employee_number,
-        supervisor_id,
-        0 AS LEVEL
-    FROM V_EMPLOYEE_SUPERVISOR_VIEW
-    WHERE employee_number = ' . $employee_id . '
-    UNION ALL
-    SELECT 
-        e.employee_number,
-        e.supervisor_id,
-        s.LEVEL + 1
-    FROM V_EMPLOYEE_SUPERVISOR_VIEW e
-    JOIN subordinate s ON e.supervisor_id = s.employee_number
-)
-SELECT 
-    s.employee_number,
-    m.employee_number AS direct_superior_id,
-    m.employee_name AS direct_superior_first_name,
-    s.LEVEL AS level,
-    s.project_codification_key,
-    s.project_name,
-    s.customer_code,
-    s.customer_name
-FROM subordinate s
-JOIN V_EMPLOYEE_SUPERVISOR_VIEW m ON s.supervisor_id = m.employee_number
-ORDER BY s.LEVEL;';
-
-
-/////
-WITH RECURSIVE subordinate AS (
-  SELECT employee_number,
-         employee_name,
-         supervisor_id,
-         0 AS LEVEL,
-         project_codification_key,
-         project_name,
-         customer_code,
-         customer_name
-  FROM V_EMPLOYEE_SUPERVISOR_VIEW
-  WHERE employee_number = $employee_id
-  UNION ALL
-  SELECT e.employee_number,
-         e.employee_name,
-         e.supervisor_id,
-         LEVEL + 1,
-         e.project_codification_key,
-         e.project_name,
-         e.customer_code,
-         e.customer_name
-  FROM V_EMPLOYEE_SUPERVISOR_VIEW e
-  JOIN subordinate s ON e.supervisor_id = s.employee_number
-)
-SELECT
-  s.employee_number,
-  s.employee_number AS direct_superior_id,
-  e.employee_name AS direct_superior_first_name,
-  s.level,
-  s.project_codification_key,
-  s.project_name,
-  s.customer_code,
-  s.customer_name
-FROM subordinate s
-JOIN V_EMPLOYEE_SUPERVISOR_VIEW e ON s.supervisor_id = e.employee_number
-WHERE s.employee_number NOT IN (SELECT employee_number FROM subordinate)
-ORDER BY s.level;
-
-
-
-
-
-
+$monthDiff = getMonthDifference($startDate, $endDate);
